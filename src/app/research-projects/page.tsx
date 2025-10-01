@@ -1,0 +1,504 @@
+// @ts-nocheck
+
+"use client"
+
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useDispatch, useSelector } from "react-redux"
+import { fetchProjects } from "@/lib/features/auth/projectSlice"
+import { Search, Filter, Eye, ThumbsUp, MessageSquare, User, MapPin, Calendar, FileText, Loader2, ChevronLeft, ChevronRight, AlertTriangle, BookOpen } from "lucide-react"
+import Link from "next/link"
+import SharedNavigation from "@/components/layout/Navigation"
+import { RootState } from "@/lib/store"
+
+// Skeleton Loader Components
+function SkeletonLoader({ className = "" }) {
+  return (
+    <div className={`relative overflow-hidden bg-gray-200/50 rounded ${className}`}>
+      <div
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent animate-shimmer"
+        style={{
+          animation: "shimmer 1.5s infinite linear"
+        }}
+      />
+      <style jsx>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+function CardSkeleton() {
+  return (
+    <div className="bg-white/80 backdrop-blur-md rounded-xl p-4 border border-gray-200">
+      <SkeletonLoader className="h-40 mb-3" />
+      <SkeletonLoader className="h-5 mb-2 w-3/4" />
+      <SkeletonLoader className="h-3 mb-2 w-full" />
+      <SkeletonLoader className="h-3 w-2/3" />
+    </div>
+  )
+}
+
+// HTML Cleaning Function for Rich Text
+const cleanHtml = (html:any) => {
+  if (!html) return ""
+  // Remove Quill cursor artifacts and other Quill-specific spans
+  let cleaned = html.replace(/<span class="ql-cursor">.*?<\/span>/g, "")
+  cleaned = cleaned.replace(/<span[^>]*class="[^"]*ql-ui[^"]*"[^>]*>.*?<\/span>/g, "")
+  cleaned = cleaned.replace(/ data-list="[^"]*"/g, "")
+
+  // Add proper spacing for paragraphs
+  cleaned = cleaned.replace(/<p>/g, '<p style="margin-bottom: 0.75rem; line-height: 1.5;">')
+
+  // Add proper spacing and list styles for unordered lists
+  cleaned = cleaned.replace(
+    /<ul>/g,
+    '<ul style="margin-bottom: 0.75rem; padding-left: 1.5rem; list-style-type: disc;">'
+  )
+
+  // Add proper spacing and list styles for ordered lists
+  cleaned = cleaned.replace(
+    /<ol>/g,
+    '<ol style="margin-bottom: 0.75rem; padding-left: 1.5rem; list-style-type: decimal;">'
+  )
+
+  // Add spacing for list items
+  cleaned = cleaned.replace(/<li>/g, '<li style="margin-bottom: 0.25rem; line-height: 1.4;">')
+
+  // Ensure proper heading styles
+  cleaned = cleaned.replace(/<h1>/g, '<h1 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 0.75rem;">')
+  cleaned = cleaned.replace(/<h2>/g, '<h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.75rem;">')
+  cleaned = cleaned.replace(/<h3>/g, '<h3 style="font-size: 1.125rem; font-weight: bold; margin-bottom: 0.75rem;">')
+  cleaned = cleaned.replace(/<strong>/g, '<strong style="font-weight: bold;">')
+
+  return cleaned
+}
+
+export default function ResearchProjectsPage() {
+  const router = useRouter()
+  const dispatch = useDispatch()
+  const { projects, isLoading, pagination } = useSelector((state:RootState) => state.projects)
+  const { isAuthenticated } = useSelector((state:RootState) => state.auth)
+
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedType, setSelectedType] = useState("")
+  const [selectedVisibility, setSelectedVisibility] = useState("")
+  const [showFilters, setShowFilters] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+
+  useEffect(() => {
+    dispatch(fetchProjects({
+      page: currentPage,
+      limit: 12,
+      search: searchQuery || undefined,
+      research_type: selectedType || undefined,
+      visibility: selectedVisibility || undefined,
+      status: "Published"
+    }))
+  }, [dispatch, currentPage, searchQuery, selectedType, selectedVisibility])
+
+  const handleSearch = () => {
+    setCurrentPage(1)
+  }
+
+  const handlePageChange = (newPage:any) => {
+    setCurrentPage(newPage)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const formatDate = (dateString:any) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  }
+
+  const researchTypes = ["Thesis", "Paper", "Project", "Dataset", "Case Study"]
+  const visibilityOptions = ["Public", "Community-Only"]
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] to-white">
+      <SharedNavigation />
+      
+      <div className="max-w-7xl mx-auto px-4 pt-24 pb-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-[#0158B7] to-[#0362C3] rounded-xl">
+                  <BookOpen className="w-6 h-6 text-white" />
+                </div>
+                Research Projects
+              </h1>
+              <p className="text-sm text-gray-600 mt-2">
+                Discover cutting-edge research from Rwanda's academic community
+                {pagination?.total > 0 && (
+                  <span className="ml-2 font-semibold text-[#0158B7]">
+                    ({pagination.total} projects)
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+
+          {/* Search & Filter Bar */}
+          <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  placeholder="Search by title, author, or keywords..."
+                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0158B7] text-sm"
+                />
+              </div>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-lg font-medium transition-all ${
+                  showFilters || selectedType || selectedVisibility
+                    ? "bg-[#A8C8E8]/30 text-[#0158B7] border border-[#8DB6E1]"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                <Filter className="w-5 h-5" />
+                <span>Filters</span>
+                {(selectedType || selectedVisibility) && (
+                  <span className="w-2 h-2 bg-[#0158B7] rounded-full" />
+                )}
+              </button>
+              <button
+                onClick={handleSearch}
+                className="px-6 py-3 bg-gradient-to-r from-[#0158B7] to-[#5E96D2] text-white rounded-lg hover:shadow-lg transition-all font-semibold"
+              >
+                Search
+              </button>
+            </div>
+
+            {/* Filters Panel */}
+            {showFilters && (
+              <div className="pt-4 border-t border-gray-200 space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    Research Type
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setSelectedType("")}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                        !selectedType
+                          ? "bg-[#0158B7] text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      All Types
+                    </button>
+                    {researchTypes.map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => setSelectedType(type)}
+                        className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                          selectedType === type
+                            ? "bg-[#0158B7] text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    Visibility
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setSelectedVisibility("")}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                        !selectedVisibility
+                          ? "bg-[#0158B7] text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      All Projects
+                    </button>
+                    {visibilityOptions.map((vis) => (
+                      <button
+                        key={vis}
+                        onClick={() => setSelectedVisibility(vis)}
+                        className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                          selectedVisibility === vis
+                            ? "bg-[#0158B7] text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {vis}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => {
+                      setSelectedType("")
+                      setSelectedVisibility("")
+                      setSearchQuery("")
+                      setCurrentPage(1)
+                    }}
+                    className="text-sm font-medium text-[#0158B7] hover:text-[#0362C3]"
+                  >
+                    Clear all filters
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Active Filters Display */}
+          {(searchQuery || selectedType || selectedVisibility) && (
+            <div className="flex items-center justify-between p-3 bg-[#A8C8E8]/20 border border-[#8DB6E1] rounded-lg mt-4">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-semibold text-[#0158B7]">
+                  {pagination?.total || 0} projects found
+                </span>
+                {selectedType && (
+                  <span className="px-3 py-1 bg-white border border-[#8DB6E1] rounded-full text-xs font-medium text-[#0158B7]">
+                    {selectedType}
+                  </span>
+                )}
+                {selectedVisibility && (
+                  <span className="px-3 py-1 bg-white border border-[#8DB6E1] rounded-full text-xs font-medium text-[#0158B7]">
+                    {selectedVisibility}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Projects Grid */}
+        {isLoading && projects.length === 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <CardSkeleton key={i} />
+            ))}
+          </div>
+        ) : projects.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+            <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              No research projects found
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {searchQuery || selectedType || selectedVisibility
+                ? "Try adjusting your search or filters"
+                : "Be the first to share your research"}
+            </p>
+            {!isAuthenticated && (
+              <div className="space-y-3">
+                <p className="text-sm text-gray-600">
+                  Sign in to share your research and connect with the community
+                </p>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#0158B7] to-[#0362C3] text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+                >
+                  Sign In to Continue
+                </Link>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.map((project) => (
+                <div
+                  key={project.id}
+                  onClick={() => router.push(`/research-projects/${project.id}`)}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer border border-gray-100 hover:scale-[1.02] duration-300"
+                >
+                  {/* Top Image Section */}
+                  <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-[#0158B7] to-[#0362C3]">
+                    {project.cover_image_url ? (
+                      <img
+                        src={project.cover_image_url}
+                        alt={project.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <BookOpen className="w-16 h-16 text-white opacity-30" />
+                      </div>
+                    )}
+                    
+                    {/* Research Type Badge */}
+                    <div className="absolute top-3 right-3">
+                      <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold text-[#0158B7]">
+                        {project.research_type}
+                      </span>
+                    </div>
+
+                    {/* Date Badge */}
+                    <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-lg">
+                      {formatDate(project.publication_date || project.created_at)}
+                    </div>
+
+                    {/* Featured Badge */}
+                    {project.is_featured && (
+                      <div className="absolute bottom-3 left-3">
+                        <span className="px-3 py-1 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-full text-xs font-bold flex items-center gap-1">
+                          <CheckCircle className="w-3 h-3" />
+                          Featured
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Bottom Content Section */}
+                  <div className="p-5">
+                    <h3 className="text-base font-bold text-[#1A1F3A] mb-3 line-clamp-2 min-h-[3rem]">
+                      {project.title}
+                    </h3>
+
+                    {/* Abstract Preview */}
+                    {project.abstract && (
+                      <div
+                        className="rich-text-content text-gray-700 text-sm mb-3 line-clamp-2"
+                        dangerouslySetInnerHTML={{
+                          __html: cleanHtml(
+                            project.abstract.length > 150
+                              ? project.abstract.slice(0, 150) + "..."
+                              : project.abstract
+                          ),
+                        }}
+                        style={{
+                          lineHeight: "1.5",
+                        }}
+                      />
+                    )}
+
+                    {/* Author Info */}
+                    <div className="space-y-2 mb-3 text-xs">
+                      <div className="flex items-center text-gray-600">
+                        <User className="w-4 h-4 mr-2 text-[#0158B7] flex-shrink-0" />
+                        <span className="truncate">
+                          {project.author?.first_name} {project.author?.last_name}
+                        </span>
+                      </div>
+                      {project.author?.profile?.institution_name && (
+                        <div className="flex items-center text-gray-600">
+                          <MapPin className="w-4 h-4 mr-2 text-[#0158B7] flex-shrink-0" />
+                          <span className="truncate">
+                            {project.author.profile.institution_name}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {project.tags?.slice(0, 3).map((tag, i) => (
+                        <span
+                          key={i}
+                          className="px-2 py-1 bg-[#0158B7]/10 text-[#0158B7] text-xs rounded-full font-medium"
+                        >
+                          {tag.name}
+                        </span>
+                      ))}
+                      {project.tags?.length > 3 && (
+                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full font-medium">
+                          +{project.tags.length - 3}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Stats */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                      <div className="flex items-center space-x-4 text-xs text-gray-500">
+                        <span className="flex items-center">
+                          <Eye className="w-4 h-4 mr-1" />
+                          {project.view_count || 0}
+                        </span>
+                        <span className="flex items-center">
+                          <ThumbsUp className="w-4 h-4 mr-1" />
+                          {project.like_count || 0}
+                        </span>
+                        <span className="flex items-center">
+                          <MessageSquare className="w-4 h-4 mr-1" />
+                          {project.comment_count || 0}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {pagination && pagination.totalPages > 1 && (
+              <div className="flex items-center justify-between mt-8 bg-white rounded-xl border border-gray-200 p-4">
+                <div className="text-sm text-gray-600">
+                  Showing {((currentPage - 1) * 12) + 1} to {Math.min(currentPage * 12, pagination.total)} of {pagination.total} projects
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => {
+                      let pageNum;
+                      if (pagination.totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= pagination.totalPages - 2) {
+                        pageNum = pagination.totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+                      
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => handlePageChange(pageNum)}
+                          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                            pageNum === currentPage
+                              ? "bg-gradient-to-r from-[#0158B7] to-[#5E96D2] text-white shadow-sm"
+                              : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === pagination.totalPages}
+                    className="p-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  )
+}

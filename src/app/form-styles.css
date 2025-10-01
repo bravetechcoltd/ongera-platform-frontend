@@ -1,0 +1,63 @@
+
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"] {
+  color-scheme: light !important;
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+/* Range inputs */
+input[type="range"] {
+  color-scheme: light !important;
+}
+
+/* File inputs */
+input[type="file"] {
+  color-scheme: light !important;
+}
+
+/* Search inputs */
+input[type="search"] {
+  color-scheme: light !important;
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+/* Radio and Checkbox inputs - handle differently */
+input[type="radio"],
+input[type="checkbox"] {
+  filter: none !important; /* Prevent dark mode filters */
+  accent-color: var(--hr-blue) !important;
+}
+
+/* For datalist elements */
+datalist option {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+/* Form validation styles */
+input:valid,
+select:valid,
+textarea:valid {
+  border-color: #10b981 !important;
+}
+
+input:invalid,
+select:invalid,
+textarea:invalid {
+  border-color: #ef4444 !important;
+}
+
+/* Autofill styles */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
+  -webkit-text-fill-color: #000000 !important;
+  color-scheme: light !important;
+}
