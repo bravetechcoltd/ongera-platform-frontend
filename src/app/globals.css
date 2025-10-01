@@ -1,0 +1,623 @@
+/* globals.css */
+@import "tailwindcss";
+
+/* Custom CSS Variables for HR Theme */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --accent: #8b5cf6;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #3b82f6;
+  --radius: 0.75rem;
+
+  --hr-blue: #3b82f6;
+  --hr-purple: #8b5cf6;
+  --hr-indigo: #6366f1;
+  --hr-success: #10b981;
+  --hr-warning: #f59e0b;
+  --hr-danger: #ef4444;
+
+  --gradient-primary: linear-gradient(135deg, #3b82f6, #8b5cf6, #6366f1);
+  --gradient-success: linear-gradient(135deg, #10b981, #059669);
+  --gradient-warning: linear-gradient(135deg, #f59e0b, #d97706);
+  --gradient-danger: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--hr-blue);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Monaco', 'Cascadia Code', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --secondary: #1e293b;
+    --secondary-foreground: #f8fafc;
+    --border: #334155;
+    --input: #334155;
+  }
+}
+
+/* ============================================
+   GLOBAL FORM ELEMENT FIXES
+   ============================================ */
+input:not([type="radio"]):not([type="checkbox"]),
+select,
+textarea {
+  color-scheme: light !important;
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280 !important;
+  opacity: 1 !important;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background-color: #f3f4f6 !important;
+  color: #9ca3af !important;
+}
+
+select option {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+select optgroup {
+  color: #6b7280 !important;
+  background-color: #ffffff !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--hr-blue) !important;
+  outline-offset: 2px !important;
+  border-color: var(--hr-blue) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.bg-gradient-hr-primary  { background: var(--gradient-primary); }
+.bg-gradient-hr-success  { background: var(--gradient-success); }
+.bg-gradient-hr-warning  { background: var(--gradient-warning); }
+.bg-gradient-hr-danger   { background: var(--gradient-danger); }
+
+.text-gradient-hr-primary {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.bg-grid-pattern {
+  background-image:
+    linear-gradient(to right, rgba(0,0,0,0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.glass {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.glass-dark {
+  background: rgba(0,0,0,0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes slideInUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes slideInDown {
+  from { opacity:0; transform:translateY(-20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes fadeInScale {
+  from { opacity:0; transform:scale(0.95); }
+  to   { opacity:1; transform:scale(1); }
+}
+@keyframes pulse-glow {
+  0%,100% { box-shadow: 0 0 5px rgba(59,130,246,0.5); }
+  50%     { box-shadow: 0 0 20px rgba(59,130,246,0.8), 0 0 30px rgba(59,130,246,0.6); }
+}
+
+.animate-slide-in-up    { animation: slideInUp 0.3s ease-out; }
+.animate-slide-in-down  { animation: slideInDown 0.3s ease-out; }
+.animate-fade-in-scale  { animation: fadeInScale 0.2s ease-out; }
+.animate-pulse-glow     { animation: pulse-glow 2s infinite; }
+
+/* ============================================
+   CARD / BUTTON / FORM EFFECTS
+   ============================================ */
+.card-hover { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+}
+
+.btn-gradient {
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px 0 rgba(59,130,246,0.3);
+}
+.btn-gradient:hover  { transform:translateY(-1px); box-shadow:0 6px 20px 0 rgba(59,130,246,0.4); }
+.btn-gradient:active { transform:translateY(0); }
+
+.input-enhanced {
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(10px);
+}
+.input-enhanced:focus {
+  border-color: var(--hr-blue);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+  background: rgba(255,255,255,1);
+}
+
+/* ============================================
+   STATUS INDICATORS
+   ============================================ */
+.status-indicator {
+  display:inline-flex; align-items:center; gap:0.5rem;
+  padding:0.25rem 0.75rem; border-radius:9999px;
+  font-size:0.75rem; font-weight:500;
+}
+.status-active    { background:rgba(16,185,129,0.1); color:rgb(16,185,129); }
+.status-inactive  { background:rgba(239,68,68,0.1);  color:rgb(239,68,68); }
+.status-pending   { background:rgba(245,158,11,0.1); color:rgb(245,158,11); }
+.status-completed { background:rgba(99,102,241,0.1); color:rgb(99,102,241); }
+
+/* ============================================
+   SKELETON LOADER
+   ============================================ */
+.skeleton {
+  background: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+@keyframes loading {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-color-scheme: dark) {
+  .skeleton {
+    background: linear-gradient(90deg,#374151 25%,#4b5563 50%,#374151 75%);
+    background-size: 200% 100%;
+  }
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar-item { position:relative; overflow:hidden; }
+.sidebar-item::before {
+  content:''; position:absolute; top:0; left:-100%;
+  width:100%; height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);
+  transition:left 0.5s;
+}
+.sidebar-item:hover::before { left:100%; }
+
+/* ============================================
+   CUSTOM SCROLLBAR
+   ============================================ */
+.custom-scrollbar { scrollbar-width:thin; scrollbar-color:rgba(156,163,175,0.5) transparent; }
+.custom-scrollbar::-webkit-scrollbar { width:6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background:transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background-color:rgba(156,163,175,0.5); border-radius:3px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color:rgba(156,163,175,0.8); }
+
+/* ============================================
+   RESPONSIVE & PRINT
+   ============================================ */
+@media (max-width:768px) {
+  .mobile-padding  { padding-left:1rem; padding-right:1rem; }
+  .mobile-text-sm  { font-size:0.875rem; }
+}
+@media print {
+  .no-print        { display:none !important; }
+  .print-friendly  { background:white !important; color:black !important; box-shadow:none !important; }
+}
+
+@media (prefers-contrast:high) {
+  .card-hover    { border:2px solid currentColor; }
+  .btn-gradient  { background:var(--hr-blue); border:2px solid var(--hr-blue); }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+.focus-visible { outline:2px solid var(--hr-blue); outline-offset:2px; }
+.sr-only {
+  position:absolute; width:1px; height:1px; padding:0;
+  margin:-1px; overflow:hidden; clip:rect(0,0,0,0);
+  white-space:nowrap; border:0;
+}
+
+/* ============================================
+   RICH TEXT EDITOR (Quill toolbar UI)
+   ============================================ */
+.rich-text-editor-modern {
+  border:1px solid #e2e8f0; border-radius:12px;
+  overflow:hidden; transition:all 0.2s ease-in-out; background:white;
+}
+.rich-text-editor-modern:hover   { border-color:#cbd5e0; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+.rich-text-editor-modern:focus-within { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.1); }
+
+.rich-text-editor-modern .ql-toolbar {
+  border:none; border-bottom:1px solid #f1f5f9;
+  background:linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%);
+  padding:12px 16px;
+}
+.rich-text-editor-modern .ql-toolbar .ql-formats { margin-right:20px; }
+.rich-text-editor-modern .ql-toolbar button       { border-radius:6px; margin:2px; transition:all 0.2s ease; }
+.rich-text-editor-modern .ql-toolbar button:hover  { background:#e2e8f0; }
+.rich-text-editor-modern .ql-toolbar button.ql-active { background:#3b82f6; color:white; }
+.rich-text-editor-modern .ql-toolbar .ql-stroke   { stroke:#64748b; }
+.rich-text-editor-modern .ql-toolbar .ql-fill     { fill:#64748b; }
+.rich-text-editor-modern .ql-toolbar button:hover .ql-stroke,
+.rich-text-editor-modern .ql-toolbar button.ql-active .ql-stroke { stroke:#3b82f6; }
+.rich-text-editor-modern .ql-toolbar button:hover .ql-fill,
+.rich-text-editor-modern .ql-toolbar button.ql-active .ql-fill   { fill:#3b82f6; }
+
+.rich-text-editor-modern .ql-container {
+  border:none;
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  font-size:14px; line-height:1.6;
+}
+.rich-text-editor-modern .ql-editor {
+  padding:20px; color:#374151; min-height:200px;
+}
+.rich-text-editor-modern .ql-editor.ql-blank::before {
+  color:#9ca3af; font-style:normal; font-size:14px; left:20px;
+}
+.rich-text-editor-modern .ql-editor::-webkit-scrollbar { width:6px; }
+.rich-text-editor-modern .ql-editor::-webkit-scrollbar-track  { background:#f1f5f9; }
+.rich-text-editor-modern .ql-editor::-webkit-scrollbar-thumb  { background:#cbd5e0; border-radius:3px; }
+.rich-text-editor-modern .ql-editor::-webkit-scrollbar-thumb:hover { background:#94a3b8; }
+
+.rich-text-editor-modern .ql-editor h1,
+.rich-text-editor-modern .ql-editor h2,
+.rich-text-editor-modern .ql-editor h3  { font-weight:700; color:#1f2937; margin-top:1.5em; margin-bottom:0.5em; }
+.rich-text-editor-modern .ql-editor h1  { font-size:1.5em; border-bottom:2px solid #f3f4f6; padding-bottom:0.3em; }
+.rich-text-editor-modern .ql-editor h2  { font-size:1.3em; }
+.rich-text-editor-modern .ql-editor h3  { font-size:1.1em; }
+.rich-text-editor-modern .ql-editor p   { margin-bottom:1em; }
+.rich-text-editor-modern .ql-editor blockquote {
+  border-left:4px solid #3b82f6; background:#f8fafc;
+  padding:12px 20px; margin:16px 0; border-radius:0 8px 8px 0;
+  font-style:italic; color:#475569;
+}
+.rich-text-editor-modern .ql-editor ul,
+.rich-text-editor-modern .ql-editor ol  { padding-left:1.5em; margin:1em 0; }
+.rich-text-editor-modern .ql-editor li  { margin:0.3em 0; }
+.rich-text-editor-modern .ql-editor a   { color:#3b82f6; text-decoration:underline; text-underline-offset:2px; }
+.rich-text-editor-modern .ql-editor a:hover { color:#2563eb; }
+.rich-text-editor-modern .ql-editor .ql-code-block {
+  background:#1f2937; color:#f3f4f6; padding:16px; border-radius:8px;
+  font-family:'Monaco','Menlo','Ubuntu Mono',monospace; margin:1em 0;
+}
+
+@media (max-width:768px) {
+  .rich-text-editor-modern .ql-toolbar        { padding:8px 12px; }
+  .rich-text-editor-modern .ql-toolbar .ql-formats { margin-right:12px; }
+  .rich-text-editor-modern .ql-editor         { padding:16px; }
+}
+
+/* ============================================================
+   RICH TEXT CONTENT — rendered output (read-only display)
+   
+   KEY PROBLEMS SOLVED:
+   1. Quill writes inline background-color:rgb(255,255,255) on
+      almost every span/strong/a — this bleeds white onto
+      coloured container backgrounds (blue-50, gray-50, etc.)
+   2. Quill writes inline color:rgba(0,0,0,0.8) which ignores
+      the app's intended text colour hierarchy
+   3. &nbsp; chains produced by Quill cause text to overflow
+      its container without wrapping
+   4. Empty <p></p> tags collapse to zero height, breaking
+      the vertical rhythm
+   ============================================================ */
+
+/* ── Base container ─────────────────────────────────────── */
+.rich-text-content {
+  /* Layout */
+  max-width: 100%;
+  overflow-x: hidden;           /* never scroll sideways */
+  overflow-wrap: break-word;
+  word-break: break-word;
+  word-wrap: break-word;
+
+  /* Typography baseline */
+  font-size: 0.9375rem;         /* 15px — readable but compact */
+  line-height: 1.75;
+  color: #374151;               /* gray-700 — default text */
+
+  /* Quill inline background fix — applied to the container
+     so every descendant's white/transparent bg becomes
+     transparent, letting the container bg show through     */
+  background-color: transparent !important;
+}
+
+/* ── Kill Quill's white background spray ───────────────── */
+/*
+   Quill injects style="background-color: rgb(255, 255, 255)"
+   on virtually every <span>, <strong>, <a>, and <p>.
+   This rule resets ALL inline background-colors to
+   transparent so the component's own background shows.
+
+   We target [style*="background-color"] to avoid touching
+   elements that legitimately need a highlight colour
+   (e.g. <mark> or custom highlight spans set by the user).
+   Those are uncommon in academic abstracts, and if needed
+   they can be re-enabled with a more specific selector.
+*/
+.rich-text-content [style*="background-color"] {
+  background-color: transparent !important;
+}
+
+/* ── Kill Quill's rgba(0,0,0,0.8) colour override ──────── */
+/*
+   Quill also sets color:rgba(0,0,0,0.8) on most spans,
+   which overrides the app colour system (e.g. white text
+   on a dark gradient header becomes invisible).
+   We let the cascade handle colour naturally; only
+   explicitly coloured elements (like links) keep their hue.
+*/
+.rich-text-content [style*="color: rgba(0, 0, 0"] {
+  color: inherit !important;
+}
+.rich-text-content [style*="color:rgba(0,0,0"] {
+  color: inherit !important;
+}
+
+/* ── Fix &nbsp; overflow (Quill encodes spaces as &nbsp;) ─ */
+/*
+   Non-breaking spaces (\u00a0) never wrap. When Quill
+   replaces every normal space with &nbsp; the text becomes
+   a single unbreakable line that overflows its container.
+   white-space:normal + overflow-wrap:break-word together
+   force wrapping even through &nbsp; sequences.
+*/
+.rich-text-content * {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  word-wrap: break-word;
+  white-space: normal;          /* overrides any Quill pre-wrap */
+  background-color: transparent; /* cascade-level reset */
+}
+
+/* ── Empty paragraphs (Quill's <p></p> / <p><br></p>) ──── */
+.rich-text-content p:empty,
+.rich-text-content p:has(> br:only-child) {
+  min-height: 0.75em;           /* preserve intended spacing */
+  margin: 0;
+}
+
+/* ── Headings ───────────────────────────────────────────── */
+.rich-text-content h1 {
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin: 1.4rem 0 0.6rem;
+  color: #111827;
+  line-height: 1.3;
+}
+.rich-text-content h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 1.2rem 0 0.5rem;
+  color: #111827;
+  line-height: 1.35;
+}
+.rich-text-content h3 {
+  font-size: 1.025rem;
+  font-weight: 600;
+  margin: 1rem 0 0.4rem;
+  color: #111827;
+}
+.rich-text-content h4 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0.875rem 0 0.375rem;
+  color: #111827;
+}
+.rich-text-content h5 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0.75rem 0 0.375rem;
+  color: #374151;
+}
+
+/* First heading needs no top margin */
+.rich-text-content > h1:first-child,
+.rich-text-content > h2:first-child,
+.rich-text-content > h3:first-child { margin-top: 0; }
+
+/* ── Paragraphs ─────────────────────────────────────────── */
+.rich-text-content p {
+  margin: 0 0 0.7rem;
+  line-height: 1.75;
+  color: inherit;
+}
+.rich-text-content > p:last-child { margin-bottom: 0; }
+
+/* ── Lists ──────────────────────────────────────────────── */
+.rich-text-content ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 0.6rem 0 0.8rem;
+}
+.rich-text-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 0.6rem 0 0.8rem;
+}
+.rich-text-content li {
+  margin: 0.25rem 0;
+  line-height: 1.65;
+  color: inherit;
+}
+.rich-text-content ul ul,
+.rich-text-content ol ul,
+.rich-text-content ul ol,
+.rich-text-content ol ol { margin: 0.2rem 0; }
+
+/* ── Inline text formatting ─────────────────────────────── */
+.rich-text-content strong {
+  font-weight: 700;
+  color: inherit;               /* do NOT let Quill's #000 override */
+}
+.rich-text-content em  { font-style: italic; }
+.rich-text-content u   { text-decoration: underline; }
+.rich-text-content s   { text-decoration: line-through; }
+
+/* ── Links — keep Quill's explicit link colour but
+      override the rgba(0,0,0,0.8) Bing-tracking anchors  ─ */
+.rich-text-content a {
+  color: #0158B7;
+  text-decoration: underline;
+  text-decoration-color: rgba(1,88,183,0.35);
+  text-underline-offset: 2px;
+  overflow-wrap: break-word;
+  word-break: break-all;        /* long URLs must wrap */
+}
+.rich-text-content a:hover { text-decoration-color: #0158B7; }
+
+/* Force Quill tracking-link anchors (color:rgba(0,0,0,0.8))
+   back to the app link colour */
+.rich-text-content a[style*="color: rgba(0, 0, 0"],
+.rich-text-content a[style*="color:rgba(0,0,0"] {
+  color: #0158B7 !important;
+}
+
+/* ── Blockquotes ────────────────────────────────────────── */
+.rich-text-content blockquote {
+  border-left: 3px solid #d1d5db;
+  padding: 0.5rem 0 0.5rem 1rem;
+  margin: 0.75rem 0;
+  font-style: italic;
+  color: #6b7280;
+}
+
+/* ── Code ───────────────────────────────────────────────── */
+.rich-text-content pre {
+  background: #1f2937;
+  color: #f3f4f6;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin: 0.75rem 0;
+  overflow-x: auto;
+  font-family: monospace;
+  font-size: 0.875rem;
+  white-space: pre-wrap;        /* keep wrapping inside pre */
+}
+.rich-text-content code {
+  background: #f3f4f6;
+  padding: 0.125rem 0.3rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+  font-size: 0.875em;
+}
+.rich-text-content pre code { background: transparent; padding: 0; }
+
+/* ── Images ─────────────────────────────────────────────── */
+.rich-text-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  display: block;
+  margin: 0.75rem 0;
+}
+
+/* ── Alignment helpers (Quill inline style) ─────────────── */
+.rich-text-content [style*="text-align: center"]  { text-align: center; }
+.rich-text-content [style*="text-align: right"]   { text-align: right; }
+.rich-text-content [style*="text-align: justify"] { text-align: justify; }
+
+/* ── Font-size helpers ──────────────────────────────────── */
+.rich-text-content [style*="font-size: small"] { font-size: 0.875rem; }
+.rich-text-content [style*="font-size: large"] { font-size: 1.125rem; }
+.rich-text-content [style*="font-size: huge"]  { font-size: 1.375rem; }
+
+/* ── Spacing guards ─────────────────────────────────────── */
+.rich-text-content > *:first-child { margin-top: 0 !important; }
+.rich-text-content > *:last-child  { margin-bottom: 0 !important; }
+
+/* ── Responsive font scale ──────────────────────────────── */
+@media (max-width: 640px) {
+  .rich-text-content          { font-size: 0.875rem; }
+  .rich-text-content h1       { font-size: 1.2rem; }
+  .rich-text-content h2       { font-size: 1.05rem; }
+  .rich-text-content h3       { font-size: 0.975rem; }
+}
+
+/* ── line-clamp helper used by card previews ────────────── */
+.rich-text-content.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.rich-text-content.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ============================================================
+   CARD CONTENT OVERFLOW HANDLING
+   ============================================================ */
+.card-content,
+[class*="CardContent"] { overflow-x: auto; max-width: 100%; }
+
+/* ============================================================
+   UTILITY
+   ============================================================ */
+.select-none {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+.break-words    { word-wrap:break-word; overflow-wrap:break-word; word-break:break-word; }
+.whitespace-normal    { white-space: normal; }
+.whitespace-pre-wrap  { white-space: pre-wrap; }
