@@ -6,8 +6,7 @@ import { useAppSelector, useAppDispatch } from "@/lib/hooks"
 import { fetchUserProfile } from "@/lib/features/auth/profileSlice"
 import { useSessionMonitor } from '@/lib/hooks/useSessionMonitor'
 import CompactNavbar from "@/components/dashboard/CompactNavbar"
-import { AlertCircle, Loader2 } from "lucide-react"
-
+import { AlertCircle } from "lucide-react"
 
 export default function UserDashboardLayout({
   children,
@@ -33,8 +32,6 @@ export default function UserDashboardLayout({
     }
   }, [isAuthenticated, authLoading, authUser, userProfile, profileLoading, dispatch, router])
 
-
-
   if (!isAuthenticated) {
     return null
   }
@@ -47,7 +44,7 @@ export default function UserDashboardLayout({
         <div className="text-center bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <AlertCircle className="h-6 w-6 text-red-600 mx-auto mb-3" />
           <p className="text-gray-600 text-sm">Unable to load user data. Please try again.</p>
-          <button 
+          <button
             onClick={() => {
               if (typeof window !== 'undefined') {
                 window.location.reload()
@@ -63,11 +60,8 @@ export default function UserDashboardLayout({
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      <CompactNavbar />
-      <main className="flex-1 overflow-y-auto p-3">
-        {children}
-      </main>
-    </div>
+    <CompactNavbar>
+      {children}
+    </CompactNavbar>
   )
 }

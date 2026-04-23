@@ -652,6 +652,9 @@ function Navigation() {
   )
 }
 
+// ==================== ENHANCED HERO SECTION ====================
+// Drop-in replacement. All original functionality preserved.
+// Right panel: full-bleed splash carousel + vertical stats strip integrated inside.
 
 function HeroSection({ summary, isLoading }) {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth)
@@ -659,255 +662,253 @@ function HeroSection({ summary, isLoading }) {
   const y1 = useTransform(scrollY, [0, 500], [0, 150])
   const y2 = useTransform(scrollY, [0, 500], [0, 250])
 
-  // Animated text cycling
   const [currentTextIndex, setCurrentTextIndex] = useState(0)
+  const [activeSplashIndex, setActiveSplashIndex] = useState(0)
+
   const animatedTexts = [
     "Empowering Rwanda's",
     "Dushakashake",
-    "Dushakira U'Rwanda"
+    "Dushakira U'Rwanda",
   ]
 
-  // Scroll functions
-  const scrollToNextSection = () => {
-    const nextSection = document.getElementById('features-section')
-    nextSection?.scrollIntoView({ behavior: 'smooth' })
-  }
+  const splashSlides = [
+    {
+      img: "https://images.unsplash.com/photo-1576091160651-e028ca26a943?q=80&w=2070&auto=format&fit=crop",
+      eyebrow: "SHARE RESEARCH",
+      headline: "Your Work Deserves\nan Audience",
+      cta: "Publish Now",
+      icon: Upload,
+      href: "/register",
+    },
+    {
+      img: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?q=80&w=2070&auto=format&fit=crop",
+      eyebrow: "JOIN COMMUNITIES",
+      headline: "Find Your Research\nTribe",
+      cta: "Explore Groups",
+      icon: Users,
+      href: "/communities",
+    },
+    {
+      img: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop",
+      eyebrow: "ATTEND EVENTS",
+      headline: "Learn From the\nBest Minds",
+      cta: "View Events",
+      icon: Calendar,
+      href: "/events",
+    },
+    {
+      img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2070&auto=format&fit=crop",
+      eyebrow: "TRACK IMPACT",
+      headline: "See How Far\nYour Ideas Travel",
+      cta: "Get Started",
+      icon: TrendingUp,
+      href: "/register",
+    },
+  ]
+
+  // Vertical stats — 4 cards inside the right strip
+  const verticalStats = [
+    { icon: FileText, value: summary?.projectsCount    || 0, label: "Projects",    accent: "#C9932A" },
+    { icon: Users,    value: summary?.researchersCount || 0, label: "Researchers", accent: "#5E96D2" },
+    { icon: Globe,    value: summary?.communitiesCount || 0, label: "Communities", accent: "#34d399" },
+    { icon: Calendar, value: summary?.eventsCount      || 0, label: "Events",      accent: "#f472b6" },
+  ]
+
+  const trustIndicators = [
+    { icon: CheckCircle, text: "University Partnerships" },
+    { icon: CheckCircle, text: "Secure & Private" },
+    { icon: CheckCircle, text: "Government Supported" },
+    { icon: CheckCircle, text: "Free for Researchers" },
+  ]
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTextIndex((prev) => (prev + 1) % animatedTexts.length)
-    }, 3000)
-    return () => clearInterval(interval)
+    const t = setInterval(() => setCurrentTextIndex(p => (p + 1) % animatedTexts.length), 3000)
+    return () => clearInterval(t)
   }, [])
 
-  const stats = [
-    { value: summary?.projectsCount || 0, label: 'Projects', suffix: '+' },
-    { value: summary?.researchersCount || 0, label: 'Researchers', suffix: '+' },
-    { value: summary?.communitiesCount || 0, label: 'Communities', suffix: '+' },
-    { value: summary?.eventsCount || 0, label: 'Events', suffix: '+' }
-  ]
+  useEffect(() => {
+    const t = setInterval(() => setActiveSplashIndex(p => (p + 1) % splashSlides.length), 4000)
+    return () => clearInterval(t)
+  }, [])
 
-  // Trust indicators for integrated trust bar
-  const trustIndicators = [
-    { icon: CheckCircle, text: 'University Partnerships' },
-    { icon: CheckCircle, text: 'Secure & Private' },
-    { icon: CheckCircle, text: 'Government Supported' },
-    { icon: CheckCircle, text: 'Free for Researchers' }
-  ]
+  const slide = splashSlides[activeSplashIndex]
+  const SlideIcon = slide.icon
 
   return (
     <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden pt-16">
-      {/* Base Gradient */}
+
+      {/* ── BG ── */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#0158B7] to-[#0362C3]" />
-
-      {/* Crescent Layers */}
-      <motion.div
-        className="absolute right-[-10%] top-[20%] w-[60%] h-[80%] opacity-40"
-        style={{
-          y: y1,
-          clipPath: 'ellipse(40% 50% at 100% 50%)',
-          background: '#0362C3',
-          transform: 'rotate(-15deg)'
-        }}
-      />
-      <motion.div
-        className="absolute left-[-5%] bottom-[-10%] w-[40%] h-[60%] opacity-30"
-        style={{
-          y: y2,
-          clipPath: 'circle(50% at 0% 100%)',
-          background: '#5E96D2',
-          transform: 'rotate(25deg)'
-        }}
-      />
-
+      <motion.div className="absolute right-[-10%] top-[20%] w-[60%] h-[80%] opacity-40"
+        style={{ y: y1, clipPath: "ellipse(40% 50% at 100% 50%)", background: "#0362C3", transform: "rotate(-15deg)" }} />
+      <motion.div className="absolute left-[-5%] bottom-[-10%] w-[40%] h-[60%] opacity-30"
+        style={{ y: y2, clipPath: "circle(50% at 0% 100%)", background: "#5E96D2", transform: "rotate(25deg)" }} />
       <FloatingParticles />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4">
-        {/* TWO-COLUMN LAYOUT */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
-          {/* LEFT COLUMN - Hero Content */}
+      {/* ── MAIN CONTENT ── */}
+      <div className="relative z-10 w-full max-w-[1380px] mx-auto px-4 sm:px-5">
+        <div className="flex flex-col lg:flex-row items-stretch gap-5 lg:gap-4">
+
+          {/* ══ LEFT 38% ══ */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-white"
+            initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.75 }}
+            className="text-white lg:w-[38%] flex flex-col justify-center py-8 lg:py-12 flex-shrink-0"
           >
-            {/* Animated Headline */}
-            <div className="text-3xl md:text-5xl font-bold mb-4 leading-tight min-h-[6rem] md:min-h-[7rem]">
+            {/* Animated headline */}
+            <div className="text-3xl md:text-[2.5rem] xl:text-[2.75rem] font-bold mb-3 leading-tight" style={{ minHeight: "5rem" }}>
               <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentTextIndex}
-                  initial={{ opacity: 0, y: 50, rotateX: -90 }}
-                  animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                  exit={{ opacity: 0, y: -50, rotateX: 90 }}
-                  transition={{ duration: 0.6, ease: "easeInOut" }}
-                  className="origin-center"
-                >
+                <motion.div key={currentTextIndex}
+                  initial={{ opacity: 0, y: 40, rotateX: -80 }} animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                  exit={{ opacity: 0, y: -30, rotateX: 80 }} transition={{ duration: 0.55, ease: "easeInOut" }}>
                   {animatedTexts[currentTextIndex]}
                 </motion.div>
               </AnimatePresence>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                Research Community
-              </motion.div>
+              <div>Research Community</div>
             </div>
 
-            <motion.p
-              className="text-lg md:text-xl mb-6 text-gray-100 max-w-lg"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
+            <p className="text-[14.5px] text-white/80 mb-5 leading-relaxed max-w-[290px]">
               Connect • Collaborate • Contribute to knowledge that shapes Rwanda's future
-            </motion.p>
+            </p>
 
-            {/* CTA Buttons */}
-            <motion.div
-              className="flex flex-col sm:flex-row gap-3 justify-start mb-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Link
-                  href={isAuthenticated ? "/dashboard" : "/register"}
-                  className="inline-block bg-white text-[#0158B7] font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-2xl transition-all text-sm"
-                >
+            {/* CTAs */}
+            <div className="flex flex-wrap gap-2.5 mb-6">
+              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
+                <Link href={isAuthenticated ? "/dashboard" : "/register"}
+                  className="inline-block bg-white text-[#0158B7] font-bold py-2.5 px-5 rounded-full shadow-lg hover:shadow-xl transition-all text-sm">
                   {isAuthenticated ? "Go to Dashboard" : "Start Sharing Research"}
                 </Link>
               </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Link
-                  href={isAuthenticated ? "/dashboard/user/communities" : "#communities"}
-                  className="inline-block border border-white text-white font-bold py-3 px-6 rounded-full hover:bg-white hover:text-[#0158B7] transition-all text-sm"
-                >
+              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
+                <Link href={isAuthenticated ? "/dashboard/user/communities" : "#communities"}
+                  className="inline-block border border-white/60 text-white font-semibold py-2.5 px-5 rounded-full hover:bg-white/10 transition-all text-sm">
                   Explore Communities
                 </Link>
               </motion.div>
-            </motion.div>
+            </div>
 
-            {/* INTEGRATED TRUST INDICATORS (from TrustBar) */}
-            <motion.div
-              className="flex flex-wrap items-center gap-4 pt-4 border-t border-white/20"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-            >
+            {/* Trust indicators */}
+            <motion.div className="flex flex-wrap gap-x-4 gap-y-2 pt-4 border-t border-white/15"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
               {trustIndicators.map((item, i) => (
-                <motion.div
-                  key={i}
-                  className="flex items-center space-x-1.5"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.9 + i * 0.1 }}
-                >
-                  <item.icon className="w-3.5 h-3.5 text-white/80" />
-                  <span className="text-xs text-white/80">{item.text}</span>
+                <motion.div key={i} className="flex items-center gap-1.5"
+                  initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.9 + i * 0.08 }}>
+                  <item.icon className="w-3 h-3 text-white/65" />
+                  <span className="text-[11px] text-white/65">{item.text}</span>
                 </motion.div>
               ))}
             </motion.div>
           </motion.div>
 
-          {/* RIGHT COLUMN - Platform Capabilities Panel */}
+          {/* ══ RIGHT 62% ══ */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.4 }}
-            className="relative"
+            initial={{ opacity: 0, x: 36 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.35 }}
+            className="lg:w-[62%] py-4 lg:py-6 flex-shrink-0"
           >
-            <div className="relative bg-white/10 backdrop-blur-md rounded-2xl p-6 shadow-2xl border border-white/20 mt-2 mb-2">
-              {/* Decorative elements */}
-              <svg
-                className="absolute -top-10 -right-10 w-[150px] h-[150px] opacity-20"
-                viewBox="0 0 200 200"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle cx="140" cy="40" r="120" stroke="white" strokeWidth="20" fill="none" />
-              </svg>
+            {/* Card wrapper — clips image + strips */}
+            <div className="relative rounded-md overflow-hidden shadow-2xl border border-white/10 flex"
+              style={{ height: "440px" }}>
 
-              <div className="mb-5">
-                <span className="text-[#C9932A] text-[0.625rem] uppercase tracking-[0.15em] font-semibold">PLATFORM CAPABILITIES</span>
-                <div className="w-12 h-0.5 bg-[#C9932A] mt-2" />
+              {/* ── SPLASH IMAGE AREA (fills remaining width) ── */}
+              <div className="relative flex-1 overflow-hidden">
+
+                {/* Image crossfade */}
+                <AnimatePresence mode="sync">
+                  <motion.div key={activeSplashIndex} className="absolute inset-0"
+                    initial={{ opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }} transition={{ duration: 0.7 }}>
+                    <img src={slide.img} alt="" className="w-full h-full object-cover object-top" />
+                    {/* Dark-bottom overlay for text legibility */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#000d20]/90 via-[#001740]/55 to-transparent" />
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* PLATFORM CAPABILITIES — top-left label */}
+                <div className="absolute top-5 left-5 z-10">
+                  <span className="text-[#C9932A] text-[0.58rem] uppercase tracking-[0.18em] font-bold">
+                    Platform Capabilities
+                  </span>
+                  <div className="w-7 h-[1.5px] bg-[#C9932A] mt-1" />
+                </div>
+
+                {/* Slide content — pinned to bottom */}
+                <AnimatePresence mode="wait">
+                  <motion.div key={activeSplashIndex}
+                    initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.42 }}
+                    className="absolute bottom-0 left-0 right-0 z-10 p-5 pb-6">
+
+                    {/* Eyebrow pill */}
+                    <div className="inline-flex items-center gap-1.5 bg-white/12 backdrop-blur-sm border border-white/20 rounded-full px-3 py-[5px] mb-3">
+                      <SlideIcon className="w-3 h-3 text-white" />
+                      <span className="text-[9px] font-bold text-white tracking-[0.15em] uppercase">
+                        {slide.eyebrow}
+                      </span>
+                    </div>
+
+                    {/* Headline — two crisp lines */}
+                    <h3 className="text-[1.55rem] md:text-[1.75rem] font-bold text-white leading-[1.18] mb-3 whitespace-pre-line">
+                      {slide.headline}
+                    </h3>
+
+                    {/* CTA button */}
+                    <Link href={isAuthenticated ? "/dashboard" : slide.href}
+                      className="inline-flex items-center gap-1.5 bg-[#C9932A] hover:bg-[#e8aa4a] text-white text-xs font-bold px-4 py-2 rounded-full transition-colors group">
+                      {slide.cta}
+                      <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                    </Link>
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Dot navigation — bottom-right */}
+                <div className="absolute bottom-[22px] right-4 z-10 flex items-center gap-1.5">
+                  {splashSlides.map((_, i) => (
+                    <button key={i} onClick={() => setActiveSplashIndex(i)}
+                      className={`transition-all rounded-full ${
+                        i === activeSplashIndex
+                          ? "w-5 h-[5px] bg-[#C9932A]"
+                          : "w-[5px] h-[5px] bg-white/35 hover:bg-white/60"
+                      }`} />
+                  ))}
+                </div>
               </div>
 
-              {/* Stats Row - Compact */}
-              {isLoading ? (
-                <div className="grid grid-cols-2 gap-3 mb-5">
-                  {[...Array(4)].map((_, i) => (
-                    <SkeletonLoader key={i} className="h-16 rounded-lg" />
-                  ))}
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-3 mb-5">
-                  {stats.map((stat, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.8 + i * 0.1 }}
-                      className="bg-white/20 rounded-lg p-3 text-center"
-                    >
-                      <div className="text-xl md:text-2xl font-bold text-white">
-                        <AnimatedCounter end={stat.value} suffix={stat.suffix} />
-                      </div>
-                      <div className="text-xs text-white/80">{stat.label}</div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-
-              {/* Key Features List */}
-              <div className="space-y-2.5">
-                {[
-                  { icon: Upload, text: "Share Research", tag: "DOI Integration" },
-                  { icon: Users, text: "Join Communities", tag: "50+ Groups" },
-                  { icon: Calendar, text: "Attend Events", tag: "Webinars & Conferences" },
-                  { icon: TrendingUp, text: "Track Impact", tag: "Analytics & Metrics" },
-                ].map((item, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 1.0 + (index * 0.1) }}
-                    className="group flex items-center gap-3 hover:bg-white/10 rounded-lg p-1.5 -mx-1.5 transition-all duration-300 cursor-pointer"
+              {/* ── VERTICAL STATS STRIP (fixed width, right side of card) ── */}
+              <div className="w-[105px] flex-shrink-0 bg-[#010e2a]/85 backdrop-blur-md border-l border-white/10
+                              flex flex-col items-stretch justify-center divide-y divide-white/10">
+                {verticalStats.map((stat, i) => (
+                  <motion.div key={i}
+                    initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.75 + i * 0.1 }}
+                    className="flex flex-col items-center justify-center text-center px-2 py-5"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
-                      <item.icon className="w-4 h-4 text-white" />
+                    {/* Icon badge */}
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-2 flex-shrink-0"
+                      style={{ background: `${stat.accent}1a`, border: `1px solid ${stat.accent}40` }}>
+                      <stat.icon className="w-[15px] h-[15px]" style={{ color: stat.accent }} />
                     </div>
-                    <span className="text-white text-sm font-medium flex-1">{item.text}</span>
-                    <span className="bg-white/20 text-white/80 text-[0.625rem] font-medium px-2 py-1 rounded-full">
-                      {item.tag}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-white/50 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+
+                    {/* Number */}
+                    <div className="text-[1.15rem] font-bold text-white leading-none mb-1">
+                      {isLoading
+                        ? <SkeletonLoader className="w-8 h-4 rounded mx-auto" />
+                        : <AnimatedCounter end={stat.value} suffix="+" />
+                      }
+                    </div>
+
+                    {/* Label */}
+                    <div className="text-[9.5px] font-medium leading-tight" style={{ color: `${stat.accent}b3` }}>
+                      {stat.label}
+                    </div>
                   </motion.div>
                 ))}
               </div>
 
-    
             </div>
           </motion.div>
+
         </div>
-
-
       </div>
-
-      {/* Wave Divider */}
-      <svg
-        className="absolute bottom-0 left-0 w-full"
-        viewBox="0 0 1440 80"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M0,50 Q360,0 720,50 T1440,50 L1440,80 L0,80 Z"
-          fill="#F8F9FA"
-        />
-      </svg>
     </section>
   )
 }

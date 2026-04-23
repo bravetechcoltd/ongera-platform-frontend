@@ -43,6 +43,7 @@ import InstitutionCommentThread from "@/components/institution/InstitutionCommen
 import InstitutionActivityTimeline from "@/components/institution/InstitutionActivityTimeline";
 import ReworkRequestModal from "@/components/institution/ReworkRequestModal";
 import PublishDecisionModal from "@/components/institution/PublishDecisionModal";
+import RejectModal from "@/components/institution/RejectModal";
 import { SmartDocumentPreview, useDocumentPreview, DocumentLink } from "@/components/ui/SmartDocumentPreview";
 import RichContent from "@/components/institution/RichContent";
 
@@ -68,6 +69,10 @@ export default function InstitutionProjectDetailPage({
   } = useAppSelector((s: any) => s.institutionResearch);
 
   const [reworkOpen, setReworkOpen] = useState(false);
+  const [rejectOpen, setRejectOpen] = useState(false);
+  const [rejectStage, setRejectStage] = useState<"SUPERVISOR" | "INSTRUCTOR">(
+    "SUPERVISOR"
+  );
   const [reworkStage, setReworkStage] = useState<"SUPERVISOR" | "INSTRUCTOR">(
     "SUPERVISOR"
   );
@@ -151,19 +156,21 @@ export default function InstitutionProjectDetailPage({
     }
   };
 
-  const doSupervisorReview = async (action: "APPROVED" | "REJECTED") => {
-    const res: any = await dispatch(
-      supervisorReviewProject({ id, action })
-    );
+  const doSupervisorReview = async (action: "APPROVED" | "REWORK_REQUESTED" | "REJECTED", feedback?: string) => {
+    const payload: any = { id, action };
+    if (feedback) payload.feedback = feedback;
+    
+    const res: any = await dispatch(supervisorReviewProject(payload));
     if (res?.meta?.requestStatus === "fulfilled") {
       dispatch(fetchProjectActivity(id));
     }
   };
 
-  const doInstructorReview = async (action: "APPROVED" | "REJECTED") => {
-    const res: any = await dispatch(
-      instructorReviewProject({ id, action })
-    );
+  const doInstructorReview = async (action: "APPROVED" | "REWORK_REQUESTED" | "REJECTED", feedback?: string) => {
+    const payload: any = { id, action };
+    if (feedback) payload.feedback = feedback;
+    
+    const res: any = await dispatch(instructorReviewProject(payload));
     if (res?.meta?.requestStatus === "fulfilled") {
       dispatch(fetchProjectActivity(id));
     }
@@ -177,6 +184,19 @@ export default function InstitutionProjectDetailPage({
         : await dispatch(instructorReviewProject({ id, action, feedback }));
     if (res?.meta?.requestStatus === "fulfilled") {
       setReworkOpen(false);
+      dispatch(fetchProjectActivity(id));
+      dispatch(fetchProjectComments(id));
+    }
+  };
+
+  const submitReject = async (feedback: string) => {
+    const action = "REJECTED" as const;
+    const res: any =
+      rejectStage === "SUPERVISOR"
+        ? await dispatch(supervisorReviewProject({ id, action, feedback }))
+        : await dispatch(instructorReviewProject({ id, action, feedback }));
+    if (res?.meta?.requestStatus === "fulfilled") {
+      setRejectOpen(false);
       dispatch(fetchProjectActivity(id));
       dispatch(fetchProjectComments(id));
     }
@@ -265,9 +285,11 @@ export default function InstitutionProjectDetailPage({
       actions.push(
         <button
           key="sup-reject"
-          onClick={() => doSupervisorReview("REJECTED")}
-          disabled={reviewing}
-          className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-xs inline-flex items-center gap-1 justify-center disabled:opacity-50"
+          onClick={() => {
+            setRejectStage("SUPERVISOR");
+            setRejectOpen(true);
+          }}
+          className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-xs inline-flex items-center gap-1 justify-center"
         >
           <XCircle className="w-3 h-3" /> Reject
         </button>
@@ -300,9 +322,11 @@ export default function InstitutionProjectDetailPage({
       actions.push(
         <button
           key="ins-reject"
-          onClick={() => doInstructorReview("REJECTED")}
-          disabled={reviewing}
-          className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-xs inline-flex items-center gap-1 justify-center disabled:opacity-50"
+          onClick={() => {
+            setRejectStage("INSTRUCTOR");
+            setRejectOpen(true);
+          }}
+          className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-xs inline-flex items-center gap-1 justify-center"
         >
           <XCircle className="w-3 h-3" /> Reject
         </button>
@@ -687,6 +711,16 @@ export default function InstitutionProjectDetailPage({
           reworkStage === "SUPERVISOR" ? "Supervisor" : "Instructor"
         } Stage)`}
       />
+      
+      <RejectModal
+        open={rejectOpen}
+        onClose={() => setRejectOpen(false)}
+        onSubmit={async (feedback) => submitReject(feedback)}
+        title={`Reject Project (${
+          rejectStage === "SUPERVISOR" ? "Supervisor" : "Instructor"
+        } Stage)`}
+      />
+      
       <PublishDecisionModal
         open={publishOpen}
         onClose={() => setPublishOpen(false)}
